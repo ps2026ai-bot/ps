@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮箱验证码跳转</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f7fa;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+        h3 { margin-top: 0; color: #333; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #4a90e2; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #357abd; }
+        .tips { font-size: 12px; color: #888; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3>📧 查看验证码</h3>
+    <input type="text" id="emailInput" placeholder="在此输入邮箱..." autofocus>
+    <button onclick="go()">立即查看</button>
+    <div class="tips">输入后按回车也可以跳转</div>
+</div>
+
+<script>
+    function go() {
+        var email = document.getElementById('emailInput').value.trim(); // 获取并去空格
+
+        if (!email) {
+            alert("请输入邮箱！");
+            return;
+        }
+
+        // --- 这里是根据你提供的链接拆分的 ---
+        var part1 = "http://mailws.com/m.php?u=";
+        var part2 = "&p=KWkj2025..";
+        
+        // 拼接逻辑：前半段 + 邮箱 + 后半段
+        var finalUrl = part1 + email + part2;
+
+        // 跳转
+        window.location.href = finalUrl;
+    }
+
+    // 监听回车键
+    document.getElementById("emailInput").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") go();
+    });
+</script>
+
+</body>
+</html>
