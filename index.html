@@ -2,86 +2,135 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>邮箱验证码跳转</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>验证码快速查询</title>
     <style>
         body {
-            font-family: 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f5f7fa;
+            background-color: #f2f2f7; /* 苹果风格的背景色 */
             margin: 0;
         }
         .card {
             background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             text-align: center;
-            width: 320px;
+            width: 85%;
+            max-width: 350px;
         }
-        h3 { margin-top: 0; color: #333; }
+        h2 { margin-top: 0; color: #1c1c1e; font-size: 22px; }
+        .input-group { margin: 20px 0; }
         input {
             width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid #d1d1d6;
+            border-radius: 12px;
             box-sizing: border-box;
             font-size: 16px;
+            background-color: #f9f9f9;
             outline: none;
-            transition: 0.3s;
+            -webkit-appearance: none; /* 移除iOS默认阴影 */
         }
-        input:focus { border-color: #4a90e2; }
-        button {
+        input:focus { border-color: #007aff; background-color: #fff; }
+        
+        .btn-main {
             width: 100%;
-            padding: 12px;
-            background-color: #4a90e2;
+            padding: 14px;
+            background-color: #007aff;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            margin-bottom: 12px;
+            transition: opacity 0.2s;
         }
-        button:hover { background-color: #357abd; }
-        .tips { font-size: 12px; color: #888; margin-top: 10px; }
+        .btn-main:active { opacity: 0.7; }
+
+        .btn-copy {
+            background: none;
+            border: none;
+            color: #007aff;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .tips { font-size: 12px; color: #8e8e93; margin-top: 20px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h3>📧 查看验证码</h3>
-    <input type="text" id="emailInput" placeholder="在此输入邮箱..." autofocus>
-    <button onclick="go()">立即查看</button>
-    <div class="tips">输入后按回车也可以跳转</div>
+    <h2>📧 验证码查询</h2>
+    <div class="input-group">
+        <input type="text" id="emailInput" placeholder="输入邮箱地址" autocomplete="off" autofocus>
+    </div>
+    
+    <button class="btn-main" onclick="handleJump()">立即查询</button>
+    <button class="btn-copy" onclick="handleCopy()">复制完整链接</button>
+
+    <div class="tips">
+        * 若点击无反应，请使用复制功能<br>
+        并在浏览器地址栏粘贴打开
+    </div>
 </div>
 
 <script>
-    function go() {
-        var email = document.getElementById('emailInput').value.trim(); // 获取并去空格
+    function getFullUrl() {
+        var email = document.getElementById('emailInput').value.trim();
+        if (!email) return null;
+        // 拼接你提供的特定格式链接
+        return "http://mailws.com/m.php?u=" + email + "&p=KWkj2025..";
+    }
 
-        if (!email) {
+    function handleJump() {
+        var url = getFullUrl();
+        if (!url) {
             alert("请输入邮箱！");
             return;
         }
 
-        // --- 这里是根据你提供的链接拆分的 ---
-        var part1 = "http://mailws.com/m.php?u=";
-        var part2 = "&p=KWkj2025..";
-        
-        // 拼接逻辑：前半段 + 邮箱 + 后半段
-        var finalUrl = part1 + email + part2;
-
-        // 跳转
-        window.location.href = finalUrl;
+        // 兼容性方案：创建一个隐藏的 a 标签进行模拟点击跳转
+        // rel="noreferrer" 有助于解决某些从 https 到 http 的跳转拦截问题
+        var a = document.createElement('a');
+        a.href = url;
+        a.rel = "noreferrer";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
-    // 监听回车键
+    function handleCopy() {
+        var url = getFullUrl();
+        if (!url) {
+            alert("请先输入邮箱再复制！");
+            return;
+        }
+
+        // 现代剪贴板 API
+        navigator.clipboard.writeText(url).then(function() {
+            alert("链接已复制成功！\n请前往地址栏粘贴并打开。");
+        }).catch(function() {
+            // 备用方案（针对旧版浏览器）
+            var input = document.createElement('input');
+            input.value = url;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert("链接已复制！");
+        });
+    }
+
+    // 支持回车键
     document.getElementById("emailInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") go();
+        if (e.key === "Enter") handleJump();
     });
 </script>
 
