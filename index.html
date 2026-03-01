@@ -11,7 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f2f2f7; /* 苹果风格的背景色 */
+            background-color: #f2f2f7; 
             margin: 0;
         }
         .card {
@@ -34,7 +34,7 @@
             font-size: 16px;
             background-color: #f9f9f9;
             outline: none;
-            -webkit-appearance: none; /* 移除iOS默认阴影 */
+            -webkit-appearance: none; 
         }
         input:focus { border-color: #007aff; background-color: #fff; }
         
@@ -85,8 +85,8 @@
     function getFullUrl() {
         var email = document.getElementById('emailInput').value.trim();
         if (!email) return null;
-        // 拼接你提供的特定格式链接
-        return "http://mailws.com/m.php?u=" + email + "&p=KWkj2025..";
+        // 👇 这里已经帮你修改为 KWkj2026.. 了
+        return "http://mailws.com/m.php?u=" + email + "&p=KWkj2026..";
     }
 
     function handleJump() {
@@ -96,8 +96,6 @@
             return;
         }
 
-        // 兼容性方案：创建一个隐藏的 a 标签进行模拟点击跳转
-        // rel="noreferrer" 有助于解决某些从 https 到 http 的跳转拦截问题
         var a = document.createElement('a');
         a.href = url;
         a.rel = "noreferrer";
@@ -113,19 +111,39 @@
             return;
         }
 
-        // 现代剪贴板 API
-        navigator.clipboard.writeText(url).then(function() {
-            alert("链接已复制成功！\n请前往地址栏粘贴并打开。");
-        }).catch(function() {
-            // 备用方案（针对旧版浏览器）
-            var input = document.createElement('input');
-            input.value = url;
-            document.body.appendChild(input);
-            input.select();
-            document.execCommand('copy');
-            document.body.removeChild(input);
-            alert("链接已复制！");
-        });
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url).then(function() {
+                alert("链接已复制成功！\n请前往地址栏粘贴并打开。");
+            }).catch(fallbackCopyTextToClipboard);
+        } else {
+            fallbackCopyTextToClipboard(url);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text || getFullUrl();
+        
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+            if(successful) {
+                alert("链接已复制成功！\n请前往地址栏粘贴并打开。");
+            } else {
+                alert("复制失败，请手动拼接链接。");
+            }
+        } catch (err) {
+            alert("复制失败，您的浏览器不支持此功能。");
+        }
+
+        document.body.removeChild(textArea);
     }
 
     // 支持回车键
